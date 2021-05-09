@@ -1,0 +1,29 @@
+{
+  "name": "reversi_polsterk_285",
+  "version": "0.0.1",
+  "description": "This is a web version of the game Reversi",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polsterkyle/reversi_polsterk_285.git"
+  },
+  "keywords": [
+    "reversi",
+    "polster",
+    "polsterk",
+    "hci"
+  ],
+  "author": "Kyle Polster (polsterk)",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/polsterkyle/reversi_polsterk_285/issues"
+  },
+  "homepage": "https://github.com/polsterkyle/reversi_polsterk_285#readme",
+  "dependencies": {
+    "node-static": "^0.7.11",
+    "socket.io": "^4.0.2"
+  }
+}
