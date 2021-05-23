@@ -11,16 +11,21 @@
     integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
   <style>
     .headerrow {
+      background-color: rgb(166, 189, 211);
+    }
+
+    #messagePane {
       background-color: rgb(225, 237, 248);
     }
-    .join_room_response {
-      margin: 1px 1px 1px 10px;
-      background-color: rgb(233, 234, 235);
+
+    .join_room_response,
+    .left_room_response {
+      background-color: rgb(242, 249, 255);
 
     }
     .chat_message {
       font-size: 125%;
-      margin: 1px 1px 1px 10px;
+      margin: 1px 1px 1px 5px;
       color: rgb(21, 65, 107);
     }
   </style>
@@ -32,22 +37,29 @@
   <div class="container-fluid">
     <div class="row m-3 headerrow">
       <div class="col text-center">
-        <h3>Lobby</h3>
+        <h3 id ="lobbyTitle">Lobby</h3>
       </div>
     </div>
 
     <div class="row m-3">
       <div class="col">
-        <div class="row align-items-center justify-content-center m-3">
-          <div class="col-8">
+        <div class="row align-items-start justify-content-center">
+          <div class="col-md-4">
+            <h4>Players</h4>
+          <div id = "players" class="align-items-end text-right m-3">
+            </div>
+          </div>
+          <div class="col-md-8" id="messagePane">
+            <div>
+              <h4>Messages</h4>
+            </div>
             <div class="input-group">
               <input type="text" class="form-control text-nowrap" id="chatMessage" placeholder="Enter your message here." aria-label="Enter your message to send to the chatroom"/>
               <button type="submit" class="btn btn-primary text-nowrap" id="chatButton" onclick="sendChatMessage()">Send</button>
             </div>
+            <div id="messages">
           </div>
         </div>
-        <h4>Messages</h4>
-        <div id="messages">
         </div>
       </div>
     </div>
@@ -56,7 +68,9 @@
     integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX" crossorigin="anonymous"></script>
   <script src="https://cdn.socket.io/4.0.1/socket.io.min.js" integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU" crossorigin="anonymous"></script>
   <script src="assets/js/main.js"></script>
 </body>
+
 </html>
