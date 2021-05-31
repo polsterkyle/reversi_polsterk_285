@@ -17,8 +17,8 @@ if ((typeof username == 'undefined') || (username === null) || (username === 'nu
     username = "Anonymous_" + Math.floor(Math.random()*1000);
 }
 
-let chatroom = decodeURI(getIRIParameterValue('game_id'));
-if ((typeof charRoom == 'undefined') || (chatRoom === null) || (chatRoom === 'null')){
+let chatRoom = decodeURI(getIRIParameterValue('game_id'));
+if ((typeof chatRoom == 'undefined') || (chatRoom === null) || (chatRoom === 'null')){
     chatRoom = "Lobby";
 }
 
@@ -121,7 +121,7 @@ socket.on('uninvited', (payload) => {
 
 
 socket.on('game_start_response', (payload) => {
-    if(( typeof payload == 'undefined') || (payload === null)){
+    if((typeof payload == 'undefined') || (payload === null)){
         console.log('Server did not send a payload');
         return;
     }
@@ -133,7 +133,7 @@ socket.on('game_start_response', (payload) => {
     let newNode = makeStartGameButton();
     $('.socket_'+payload.socket_id+' button').replaceWith(newNode);
     /* Jump to the game page */ 
-    window.location.href= 'game.html?username='+username+'&game_id='+payload.game_id;
+    window.location.href = 'game.html?username=' + username + '&game_id=' + payload.game_id;
 });
 
 
@@ -148,6 +148,7 @@ socket.on('join_room_response', (payload) => {
         return;
     }
 
+    /* We are notified of oursevles, then ignore */ 
     if (payload.socket_id === socket.id){
         return;
     }
@@ -222,7 +223,7 @@ function sendChatMessage(){
 }
 
 socket.on('send_chat_message_response', (payload) => {
-    if(( typeof payload == 'undefined') || (payload === null)){
+    if((typeof payload == 'undefined') || (payload === null)){
         console.log('Server did not send a payload');
         return;
     }
@@ -238,38 +239,64 @@ socket.on('send_chat_message_response', (payload) => {
     newNode.show("fade", 500);
 })
 
-let old_board = [        
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?'],
-    [ '?', '?', '?', '?', '?', '?', '?', '?']
+let old_board =  [
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?'],
+    ['?','?','?','?','?','?','?','?']
 ];
 
+let my_color = "";
+
 socket.on('game_update', (payload) => {
-    if(( typeof payload == 'undefined') || (payload === null)){
+    if ((typeof payload == 'undefined') || (payload === null)){
         console.log('Server did not send a payload');
         return;
     }
-
-    if(payload.result === 'fail') {
+    if (payload.result === 'fail') {
         console.log(payload.message);
         return;
     }
-
+  
     let board = payload.game.board;
-    if(( typeof board == 'undefined') || (board === null)) {
+    if ((typeof board == 'undefined') || (board === null)) {
         console.log('Server did not send a valid board to display');
         return;
     }
+
     /* Update my color */ 
+    if (socket.id === payload.game.player_light.socket) {
+        my_color = 'light';
+    }
+
+    else if (socket.id === payload.game.player_dark.socket) {
+        my_color = 'dark';
+    }
+
+    else {
+        window.location.href= 'lobby.html?username=' + username;
+        return;
+    }
+
+    $("#my_color").html('<h3 id="my_color">I am '+my_color+'</h3>');
+
+    let lightsum = 0;
+    let darksum = 0;
 
     /* Animate changes to the board */ 
     for (let row = 0; row < 8; row++){
     for (let column = 0; column < 8; column++) {
+        if(old_board[row][column] === 'l') {
+            whitesum++;
+            }
+            else if(old_board[row][column] === 'd') {
+                darksum++;
+            }
+
             /* Check to see if the server change any spaces on the board */ 
             if(old_board[row][column] !== board[row][column]) {
                     let graphic = "";
@@ -318,10 +345,66 @@ socket.on('game_update', (payload) => {
 
                     const t = Date.now();
                     $('#'+row+'_'+column).html('<img class="img-fluid" src="assets/images/'+graphic+'?time='+t+'" alt="'+altTag+'" />');
-            }    
-        }   
+
+                    $('#' + row + '_' + column).off('click');
+                    if (board[row][column] === ' ') {
+                        $('#' + row + '_' + column).addClass('hovered_over');
+                        $('#' + row + '_' + column).click(((r,c) => {
+                            return(() => {
+                                let payload = {
+                                    row: r,
+                                    column: c,
+                                    color: my_color
+                                };
+                                console.log('**** client log message, sending \'play_token\' command: '+JSON.stringify(payload));
+                                socket.emit('play_token',payload);
+                            });
+                        })(row,column));
+                    }
+                    else {
+                        $('#' + row + '_' + column).removeClass('hovered_over');
+                    }
+                }
+            }
+        }
+        $("#lightsum").html(lightsum);
+        $("#darksum").html(darksum);
+
+        old_board = board;
+})
+
+socket.on('play_token_response', (payload) => {
+    if ((typeof payload == 'undefined') || (payload === null)){
+        console.log('Server did not send a payload');
+        return;
     }
-    old_board = board;
+    if (payload.result === 'fail') {
+        console.log(payload.message);
+        return;
+    }
+})
+
+socket.on('game_over', (payload) => {
+    if ((typeof payload == 'undefined') || (payload === null)){
+        console.log('Server did not send a payload');
+        return;
+    }
+    if (payload.result === 'fail') {
+        console.log(payload.message);
+        return;
+    }
+
+    /* Announce with a button to the lobby */
+    let nodeA = $("<div id='game_over'></div>");
+    let nodeB = $("<h1>Game Over</h1>");
+    let nodeC = $("<h2>" + payload.who_won + " won!</h2>");
+    let nodeD = $("<a href='lobby.html?username=" + username + "' class='btn btn-lg btn-success' role='button'>Return to lobby</a>");
+    nodeA.append(nodeB);
+    nodeA.append(nodeC);
+    nodeA.append(nodeD);
+    nodeA.hide();
+    $('#game_over').replaceWith(nodeA);
+    nodeA.show("fade",1000);
 })
 
 /*Request to join the chatroom*/
@@ -334,13 +417,14 @@ $(() => {
 
     $("#lobbyTitle").html(username+"'s Lobby");
 
+    $("#quit").html("<a href='lobby.html?username=" + username + "' class='btn btn-lg btn-danger' role='button'>Quit</a>");
+
     $('#chatMessage').keypress( function (e) {
         let key = e.which;
         if( key == 13){ // the enter key
          $('button[id=chatButton]').click();
          return false;
         }
-        })
-
+    })
 });
 
