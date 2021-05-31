@@ -267,112 +267,62 @@ socket.on('game_update', (payload) => {
     }
     /* Update my color */ 
 
-
-    /* Animate changes to the board */
-    for (let row = 0; row < 8; row++) {
-        for (let column = 0; column <8; column++) {
-            if (board[row][column] === 's') {
-                lightsum++;
-            }
-            else if (board[row][column] === 'b') {
-                darksum++;
-            }
-
-            /* Check to see if the server changed any space on the board */
-            if (old_board[row][column] !== board[row][column]) {
-                let graphic = "";
-                let altTag = "";
-                if ((old_board[row][column] === '?') && (board[row][column] === ' ')) {
-                    graphic = "empty.gif";
-                    altTag = "empty space";
-                }
-                else if ((old_board[row][column] === '?') && (board[row][column] === 'l')) {
-                    graphic = "empty_to_lightgif";
-                    altTag = "light token";
-                }
-                else if ((old_board[row][column] === '?') && (board[row][column] === 'd')) {
-                    graphic = "empty_to_dark.gif";
-                    altTag = "dark token";
-                }
-                else if ((old_board[row][column] === ' ') && (board[row][column] === 'l')) {
-                    graphic = "empty_to_salmon.gif";
-                    altTag = "light token";
-                }
-                else if ((old_board[row][column] === ' ') && (board[row][column] === 'd')) {
-                    graphic = "empty_to_dark.gif";
-                    altTag = "dark token";
-                }
-                else if ((old_board[row][column] === 'l') && (board[row][column] === ' ')) {
-                    graphic = "Light_to_empty.gif";
-                    altTag = "empty space";
-                }
-                else if ((old_board[row][column] === 'd') && (board[row][column] === ' ')) {
+    /* Animate changes to the board */ 
+    for (let row = 0; row < 8; row++){
+    for (let column = 0; column < 8; column++) {
+            /* Check to see if the server change any spaces on the board */ 
+            if(old_board[row][column] !== board[row][column]) {
+                    let graphic = "";
+                    let altTag = "";
+                        
+                    if((old_board[row][column] === '?' ) && (board[row][column] === ' ')) {
+                        graphic = "empty.gif";
+                        altTag = "empty space";
+                    }
+                    else if((old_board[row][column] === '?' ) && (board[row][column] === 'l')) {
+                        graphic = "empty_to_light.gif";
+                        altTag = "light token";   
+                    }
+                    else if((old_board[row][column] ==='?') && (board[row][column] ==='d')) {
+                        graphic = "empty_to_dark.gif";
+                        altTag = "dark token";   
+                    }
+                    else if((old_board[row][column] ===' ') && (board[row][column] ==='l')) {
+                        graphic = "empty_to_light.gif";
+                        altTag = "light token";   
+                    }
+                    else if((old_board[row][column] ===' ') && (board[row][column] ==='d')) {
+                        graphic = "empty_to_dark.gif";
+                        altTag = "dark token";   
+                    }
+                    else if((old_board[row][column] === 'l' ) && (board[row][column] ===' ')) {
+                        graphic = "Light_to_empty.gif";
+                        altTag = "empty space";   
+                    }
+                    else if((old_board[row][column] ==='d') && (board[row][column] ===' ')) {
                     graphic = "dark_to_empty.gif";
                     altTag = "empty space";
-                }
-                else if ((old_board[row][column] === 'l') && (board[row][column] === 'd')) {
-                    graphic = "light_to_dark.gif";
-                    altTag = "dark token";
-                }
-                else if ((old_board[row][column] === 'd') && (board[row][column] === 'l')) {
+                    }
+                    else if((old_board[row][column] ==='l') && (board[row][column] ==='d')) {
+                        graphic = "light_to_dark.gif";
+                        altTag = "dark token";   
+                    }
+                    else if((old_board[row][column] ==='d') && (board[row][column] ==='l')) {
                     graphic = "dark_to_light.gif";
                     altTag = "light token";
-                }
-                else {
-                    graphic = "error.gif";
-                    altTag = "error";
-                }
-                const t = Date.now();
-                $('#' + row + '_' + column).html('<img class="img-fluid" src="assets/images/' + graphic + '?time=' + t + '" alt="' + altTag + '" />');
+                    }
+                    else {
+                        graphic = "error.gif";
+                        altTag = "error";
+                    }
 
-                $('#' + row + '_' + column).off('click');
-                if (board[row][column] === ' ') {
-                    $('#' + row + '_' + column).addClass('hovered_over');
-                    $('#' + row + '_' + column).click(((r,c) => {
-                        return(() => {
-                            let payload = {
-                                row: r,
-                                column: c,
-                                color: my_color
-                            };
-                            console.log('**** client log message, sending \'play_token\' command: '+JSON.stringify(payload));
-                            socket.emit('play_token',payload);
-                        });
-                    })(row,column));
-                }
-                else {
-                    $('#' + row + '_' + column).removeClass('hovered_over');
-                }
-            }
-        }
+                    const t = Date.now();
+                    $('#'+row+'_'+column).html('<img class="img-fluid" src="assets/images/'+graphic+'?time='+t+'" alt="'+altTag+'" />');
+            }    
+        }   
     }
-    $("#lightsum").html(lightsum);
-    $("#darksum").html(darksum);
-
     old_board = board;
-
 })
-
-socket.on('play_token_response', (payload) => {
-    if ((typeof payload == 'undefined') || (payload === null)){
-        console.log('Server did not send a payload');
-        return;
-    }
-    if (payload.result === 'fail') {
-        console.log(payload.message);
-        return;
-    }
-})
-
-socket.on('game_over', (payload) => {
-    if ((typeof payload == 'undefined') || (payload === null)){
-        console.log('Server did not send a payload');
-        return;
-    }
-    if (payload.result === 'fail') {
-        console.log(payload.message);
-        return;
-    }
 
 /*Request to join the chatroom*/
 $(() => {
@@ -394,4 +344,3 @@ $(() => {
 
 });
 
-})
