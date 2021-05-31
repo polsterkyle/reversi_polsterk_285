@@ -238,8 +238,94 @@ socket.on('send_chat_message_response', (payload) => {
     newNode.show("fade", 500);
 })
 
+let old_board = [         
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?'],
+    [ '?', '?', '?', '?', '?', '?', '?', '?']
+];
+
+socket.on('game_update', (payload) => {
+    if(( typeof payload == 'undefined') || (payload === null)){
+        console.log('Server did not send a payload');
+        return;
+    }
+
+    if(payload.result === 'fail') {
+        console.log(payload.message);
+        return;
+    }
+
+    let board = payload.game.board;
+    if(( typeof board == 'undefined') || (board === null)){
+        console.log('Server did not send a valid board to display');
+        return;
+    }
+    /* Update my color */ 
+
+    /* Animate changes to the board */ 
+    for (let row = 0; row < 8; row++){
+        for (let column = 0; column < 8; column++){
+            /* Check to see if the server change any spaces on the board */ 
+
+            if(old_board[row][column] !== board[row][column]) {
+                let graphic = "";
+                let altTag = "";
+                if((old_board[row][column] === '?' ) && (board[row][column] === ' ')) {
+                    graphic = "empty.gif";
+                    altTag = "empty space";
+                }
+                else if((old_board[row][column] === '?' ) && (board[row][column] === 'l')) {
+                    graphic = "empty_to_light.gif";
+                    altTag = "light token";   
+                }
+                else if((old_board[row][column] === '?' ) && (board[row][column] === 'd')) {
+                    graphic = "empty_to_dark.gif";
+                    altTag = "dark token";   
+                }
+                else if((old_board[row][column] === ' ' ) && (board[row][column] === 'l')) {
+                    graphic = "empty_to_light.gif";
+                    altTag = "light token";   
+                }
+                else if((old_board[row][column] === ' ' ) && (board[row][column] === 'd')) {
+                    graphic = "empty_to_dark.gif";
+                    altTag = "dark token";   
+                }
+                else if((old_board[row][column] === 'l' ) && (board[row][column] === ' ')) {
+                    graphic = "Light_to_empty.gif";
+                    altTag = "empty space";   
+                }
+                else if((old_board[row][column] === 'd' ) && (board[row][column] === ' ')) {
+                   graphic = "dark_to_empty.gif";
+                   altTag = "empty space";
+                }
+                else if((old_board[row][column] === 'l' ) && (board[row][column] === 'd')) {
+                    graphic = "light_to_dark.gif";
+                    altTag = "dark token";   
+                }
+                else if((old_board[row][column] === 'd' ) && (board[row][column] === 'l')) {
+                   graphic = "dark_to_light.gif";
+                   altTag = "light token";
+                }
+                else {
+                    graphic = "error.gif";
+                    altTag = "error";
+                }
+
+                const t = Date.now();
+                $('#'+row+'_'+column).html('<img class="img-fluid" src="assets/images/'+graphic+'?time='+t+'" alt="'+altTag+'" />');
+            }    
+        }   
+    }
+    old_board = board;
+})
+
 /*Request to join the chatroom*/
-$( () => {
+$(() => {
     let request = {};
     request.room = chatRoom;
     request.username = username;
