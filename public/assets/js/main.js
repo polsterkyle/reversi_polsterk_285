@@ -291,7 +291,7 @@ socket.on('game_update', (payload) => {
     for (let row = 0; row < 8; row++){
     for (let column = 0; column < 8; column++) {
         if(old_board[row][column] === 'l') {
-            whitesum++;
+            lightsum++;
             }
             else if(old_board[row][column] === 'd') {
                 darksum++;
