@@ -410,7 +410,7 @@ io.on('connection', (socket) => {
 
             let room = players[socket.id].room; 
             delete players[socket.id];
-            /* Tell people who left the room */ 
+            /* Tell people  o left the room */ 
             io.of("/").to(room).emit('player_disconnected', payload);
             serverLog('player_disconnected succeeded ', JSON.stringify(payload));
         }
@@ -522,7 +522,6 @@ io.on('connection', (socket) => {
             return;
             }
 
-        
         let game_id = player.room;
         if ((typeof game_id == 'undefined') || game_id === null ){
             response = {};
@@ -573,6 +572,33 @@ io.on('connection', (socket) => {
             return;
         }
 
+        /* Make sure the current attempt is by the correct color */ 
+        if (color !== game.whose_turn) {
+            let response = {
+                result: 'fail',
+                message: 'play_token played the wrong color. It is not their turn.'
+
+            }
+            socket.emit('play_token_response',response);
+            serverLog('play_token command failed', JSON.stringify(response));
+            return;
+        }
+
+        /* Make sure the current play is coming from the expected player */
+        if (
+            ((game.whose_turn === 'light') && (game.player_light.socket != socket.id)) ||
+            ((game.whose_turn === 'dark') && (game.player_dark.socket != socket.id))
+            )
+            {
+            let response = {
+                result: 'fail',
+                message: 'play_token played the right color, but by the wrong player.'
+            }
+            socket.emit('play_token_response',response);
+            serverLog('play_token command failed', JSON.stringify(response));
+            return;
+        }
+
         let response = {
             result: 'success'
         }
@@ -581,12 +607,16 @@ io.on('connection', (socket) => {
         /* Exectuve the more */ 
         if (color === 'light') {
             game.board[row][column] = 'l';
+            flip_token('l',row,column,game.board);
             game.whose_turn = 'dark';
+            game.legal_moves = calculate_legal_moves('d',game.board);
         }
 
         else if (color === 'dark') {
             game.board[row][column] = 'd';
+            flip_token('d',row,column,game.board);
             game.whose_turn = 'light';
+            game.legal_moves = calculate_legal_moves('l',game.board);
         }
 
         send_game_update(socket,game_id,'played a token');
@@ -613,7 +643,7 @@ function create_new_game() {
     var d = new Date();
     new_game.last_move_time = d.getTime();
 
-    new_game.whose_turn = 'light';
+    new_game.whose_turn = 'dark';
 
     new_game.board = [
 
@@ -626,8 +656,109 @@ function create_new_game() {
         [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
         [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
     ];
+
+    new_game.legal_moves = calculate_legal_moves('d',new_game.board);
+
     return new_game;
 
+}
+
+function check_line_match(color,dr,dc,r,c,board){
+    if(board[r][c] === color){
+        return true;
+    }
+    if(board[r][c] === ' '){
+        return false;
+    }
+    /* Check to make sure we won't leave the board space */
+    if (( r + dr < 0) || ( r + dr > 7)){
+        return false;
+    }
+    if (( c + dc < 0) || ( c + dc > 7)){
+        return false;
+    }
+
+    return(check_line_match(color,dr,dc,r+dr,c+dc,board))
+
+}
+
+/* will return true if r + dr supports playing at r / same for column */ 
+function adjacent_support(who,dr,dc,r,c,board){
+    let other;
+    if(who === 'd'){
+        other = 'l';
+    }
+    else if(who === 'l'){
+        other = 'd';
+    }
+    else{
+        log("We have a problem:"+who);
+        return false;
+    }
+
+    /* Check to make sure that the adjacent support is on the board */ 
+    if (( r + dr < 0) || ( r + dr > 7)){
+        return false;
+    }
+    if (( c + dc < 0) || ( c + dc > 7)){
+        return false;
+    }
+
+    /* Check that the opposite color is present */ 
+
+    if (board[r+dr][c+dc] !== other){
+        return false;
+    }
+
+    /* Check to make sure that there is space for a matching color to capture tokens */
+    if (( r + dr + dr < 0) || ( r + dr + dr > 7)){
+        return false;
+    }
+    if (( c + dc + dc < 0) || ( c + dc + dc > 7)){
+        return false;
+    }
+
+    return check_line_match(who,dr,dc,r+dr+dr,c+dc+dc, board);
+}
+
+function calculate_legal_moves(who,board){
+    let legal_moves = [
+
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+    ];
+
+    for(let row = 0; row < 8; row++) {
+        for (let column = 0; column < 8; column++) {
+            if (board[row][column]=== ' '){
+                nw = adjacent_support(who,-1,-1, row,column,board);
+                nn = adjacent_support(who,-1,0, row,column,board);
+                ne = adjacent_support(who,-1,1, row,column,board);
+
+                ww = adjacent_support(who,0,-1, row,column,board);
+                ee = adjacent_support(who,0,1, row,column,board);
+
+                sw = adjacent_support(who,1,-1, row,column,board);
+                ss = adjacent_support(who,1,0, row,column,board);
+                se = adjacent_support(who,1,1, row,column,board);
+
+                if( nw || nn || ne || ww || ee || sw || ss || se){
+                    legal_moves[row][column] = who;
+                }
+            }
+        }
+    }
+    return legal_moves;
+}
+
+function flip_token(who,row,column,board){
+    
 }
 
 function send_game_update(socket, game_id, message){
