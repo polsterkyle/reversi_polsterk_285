@@ -28,6 +28,7 @@ table#game_board td{
     border: 1px solid black;
     margin: 0px;
     padding: 0px;
+    background-color: white;
 }
 
 td.hovered_over:hover{
