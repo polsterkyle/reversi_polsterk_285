@@ -1,36 +1,123 @@
 
-body {
-    background-color: rgb(203, 230, 241);
-  }
+ @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css");
 
-.headerrow, #messagePane {
-  background-color: rgb(230, 243, 255);
-}
+ * {
+     box-sizing: border-box;
+ }
+
+ body {
+     line-height: 1.6;
+     margin: 0;
+     min-height: 100vh;
+ }
+ ul {
+   margin: 0;
+   padding: 0;
+   list-style: none;
+ }
+ 
+ 
+ h2,h3,a {
+     color: #34495e;
+ }
+ 
+ a {
+     text-decoration: none;
+ }
+ 
+ .logo {
+     margin: 0;
+     font-size: 1.45em;
+ }
+ 
+ .main-nav {
+     margin-top: 5px;
+ 
+ }
+ .logo a,
+ .main-nav a {
+     padding: 10px 15px;
+     text-transform: uppercase;
+     text-align: center;
+     display: block;
+ }
+ 
+ .main-nav a {
+     color: #34495e;
+     font-size: .99em;
+ }
+ 
+ .main-nav a:hover {
+     color: #718daa;
+ }
+ 
+ .header {
+     padding-top: .5em;
+     padding-bottom: .5em;
+     border: 1px solid #a2a2a2;
+     background-color: #f4f4f4;
+     -webkit-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.75);
+     -moz-box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.75);
+     box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.75);
+     -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+     border-radius: 5px;
+ }
+ 
+ @media (min-width: 769px) {
+     .header,
+     .main-nav {
+         display: flex;
+     }
+     .header {
+         flex-direction: column;
+         align-items: center;
+         .header{
+         width: 80%;
+         margin: 0 auto;
+         max-width: 1150px;
+     }
+     }
+ }
+ 
+ @media (min-width: 1025px) {
+     .header {
+         flex-direction: row;
+         justify-content: space-between;
+     }
+ 
+ }
 
 .join_room_response,
 .left_room_response {
-  background-color: rgb(242, 249, 255);
+background-color: rgb(242, 249, 255);
 
 }
 .chat_message {
-  font-size: 125%;
-  margin: 1px 1px 1px 5px;
-  color: rgb(21, 65, 107);
+font-size: 125%;
+margin: 1px 1px 1px 5px;
+color: rgb(21, 65, 107);
 }
 
 table#game_board{
-    border: 4px solid black;
-    margin: 0px;
-    padding: 0px;
+  margin: 0px;
+  padding: 0px;
+  background-color: white;
 }
 
 table#game_board td{
-    border: 1px solid black;
-    margin: 0px;
-    padding: 0px;
-    background-color: white;
+  border: 1px solid black;
+  margin: 0px;
+  padding: 0px;
 }
 
 td.hovered_over:hover{
-  background-image: url('/assets/images/hover.gif');
+background-image: url('/assets/images/hover.gif');
+}
+
+.chat_message {
+  font-size: 125%;
+  padding-top:0.5em;
+  margin: 2px 2px 1px 5px;
+  color: #631a93;
 }

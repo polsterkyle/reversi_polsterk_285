@@ -29,7 +29,7 @@ socket.on('log', function (array) {
 });
 
 function makeInviteButton(socket_id) {
-    let newHTML = "<button type='button' class='btn btn-outline-primary'>Invite</button>";
+    let newHTML = "<button type='button' class='btn btn-info'>Invite</button>";
     let newNode = $(newHTML);
     newNode.click(() => {
         let payload = {

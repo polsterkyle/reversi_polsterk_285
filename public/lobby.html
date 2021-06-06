@@ -10,56 +10,80 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
   <style>
-    .headerrow {
-      background-color: rgb(166, 189, 211);
-    }
-
     #messagePane {
       background-color: rgb(225, 237, 248);
     }
 
-    .join_room_response,
-    .left_room_response {
-      background-color: rgb(242, 249, 255);
-
-    }
     .chat_message {
       font-size: 125%;
-      margin: 1px 1px 1px 5px;
-      color: rgb(21, 65, 107);
+      padding-top:0.5em;
+      margin: 2px 2px 1px 5px;
+      color: rgb(99, 26, 148);
     }
   </style>
+
+<link rel= 'stylesheet' href='assets/css/lobby.css' />
 
   <title>Reversi: Lobby</title>
 </head>
 
 <body>
+
+  <!-- Navigation Bar -->
+  <header class="header">
+    <h1 class="logo"><a href="index.html">Reversi</a></h1>
+      <ul class="main-nav">
+          <li><a href="about.html">About</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/Reversi">Game Rules</a></li>
+      </ul>
+  </header> 
+
+  <br>
+
   <div class="container-fluid">
     <div class="row m-3 headerrow">
-      <div class="col text-center">
+      <div class="col text-left">
         <h3 id ="lobbyTitle">Lobby</h3>
       </div>
     </div>
 
+    <hr style="height:2px;margin-bottom: 2em;border-width:1;color:gray;background-color:gray">
+
     <div class="row m-3">
       <div class="col">
         <div class="row align-items-start justify-content-center">
-          <div class="col-md-4">
-            <h4>Players</h4>
-          <div id = "players" class="align-items-end text-right m-3">
+          
+          <div class="col-md-3 card text-white bg-dark" style="margin-right: 2em;">
+            <br>
+            <div class="card-body">
+              <h5 class="card-title">Players</h5>
+              <p class="card-text text-white">Select a player to invite to a game.</p>
+              <div id = "players" class="align-items-end text-right m-3">
             </div>
+            <hr style="height:2px;margin-bottom: 2em;border-width:1;color:gray;background-color:rgb(255, 255, 255)">
           </div>
-          <div class="col-md-8" id="messagePane">
+          </div>
+
+          <div class="col-md-8 card bg-light" id="messagePane">
             <div>
+              <br>
               <h4>Messages</h4>
             </div>
             <div class="input-group">
               <input type="text" class="form-control text-nowrap" id="chatMessage" placeholder="Enter your message here." aria-label="Enter your message to send to the chatroom"/>
-              <button type="submit" class="btn btn-primary text-nowrap" id="chatButton" onclick="sendChatMessage()">Send</button>
+              <button type="submit" class="btn btn-dark text-nowrap" id="chatButton" onclick="sendChatMessage()">Send<i class="bi-chevron-right"></i></button>
             </div>
             <div id="messages">
+              <hr>
           </div>
         </div>
+
+        <style>
+          body { 
+            background-image: url("http://unblast.com/wp-content/uploads/2018/08/Gradient-Mesh-27.jpg");
+       }
+        </style>
+
         </div>
       </div>
     </div>
